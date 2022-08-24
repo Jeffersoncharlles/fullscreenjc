@@ -1,0 +1,44 @@
+.bg-full {
+  position: fixed;
+  z-index: 1111;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+}
+.bg-full .show-content {
+  max-width: 1444px;
+}
+
+.show-content {
+  position: relative;
+}
+.show-content:hover .btn-fullscreen {
+  opacity: 1;
+}
+.show-content.full {
+  width: 100%;
+  max-width: 1440px;
+}
+.show-content.full h1, .show-content.full p {
+  display: none;
+}
+.show-content .btn-fullscreen {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 5px 10px;
+  top: 10px;
+  left: 20px;
+  border-radius: 0.5rem;
+  font-size: 10px;
+  color: white;
+  cursor: pointer;
+  opacity: 0;
+  transition: all ease 0.5s;
+}
+.show-content .btn-fullscreen:hover {
+  background: rgba(0, 0, 0, 0.5);
+}/*# sourceMappingURL=styles.css.map */
