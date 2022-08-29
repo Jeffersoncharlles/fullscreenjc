@@ -1,4 +1,4 @@
-.bg-full{
+.bg-full {
     position: fixed;
     z-index: 1111;
     top: 0;
@@ -17,28 +17,44 @@
 
 }
 
+.bg_full {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-.show-content{
+    width: 100vw;
+    height: 100vh;
+    background: rgba($color: #000000, $alpha: .8);
+
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 90;
+
+
+    .page__media {
+        margin: 10px 0;
+        width: 100%;
+        max-width: 1440px;
+        height: 100%;
+
+        .media__iframe {
+            width: 100%;
+            max-width: 1440px;
+            height: 100%;
+        }
+    }
+}
+
+.page__media {
     position: relative;
 
-    &:hover .btn-fullscreen{
+    &:hover .btn-fullscreen {
         opacity: 1;
     }
 
-    &.full{
-        // position: fixed;
-        // z-index: 1111;
-        width: 100%;
-        max-width: 1440px;
-        // top: 0;
-        // left: 0;
 
-        h1,p{
-            display: none;
-        }
-    }
-
-    .btn-fullscreen{
+    .btn-fullscreen {
         position: absolute;
         background: rgba($color: #000000, $alpha: .8);
         padding: 5px 10px;
@@ -49,11 +65,12 @@
         color: white;
         cursor: pointer;
         opacity: 0;
-        transition:all ease .5s ;
+        transition: all ease .5s;
+        z-index: 99;
 
 
-        &:hover{
-           background: rgba($color: #000000, $alpha: .5);
+        &:hover {
+            background: rgba($color: #000000, $alpha: .5);
 
         }
     }
@@ -61,4 +78,44 @@
 
 
 
+.show-content {
+    position: relative;
 
+    &:hover .btn-fullscreen {
+        opacity: 1;
+    }
+
+    &.full {
+        // position: fixed;
+        // z-index: 1111;
+        width: 100%;
+        max-width: 1440px;
+        // top: 0;
+        // left: 0;
+
+        h1,
+        p {
+            display: none;
+        }
+    }
+
+    .btn-fullscreen {
+        position: absolute;
+        background: rgba($color: #000000, $alpha: .8);
+        padding: 5px 10px;
+        top: 10px;
+        left: 20px;
+        border-radius: .5rem;
+        font-size: 10px;
+        color: white;
+        cursor: pointer;
+        opacity: 0;
+        transition: all ease .5s;
+
+
+        &:hover {
+            background: rgba($color: #000000, $alpha: .5);
+
+        }
+    }
+}
