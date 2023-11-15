@@ -52,9 +52,7 @@ Feel free to bring new features or fix problems, it will be a pleasure! 💜
 [license]: ./LICENSE
 [linkedin]: https://www.linkedin.com/in/jeffersoncharlles/
 
-## Atividades Recentes [![Time period](https://images.repography.com/28032565/billbarsch/myzap/recent-activity/e9752906386eaaf073221d572080d318_badge.svg)](https://repography.com)
-[![Pull request status graph](https://images.repography.com/28032565/Jeffersoncharlles/fullscreenjc/recent-activity/e9752906386eaaf073221d572080d318_prs.svg)](https://github.com/Jeffersoncharlles/fullscreenjc/pulls)
-[![Timeline graph](https://images.repography.com/28032565/billbarsch/Jeffersoncharlles/fullscreenjc/e9752906386eaaf073221d572080d318_timeline.svg)](https://github.com/Jeffersoncharlles/fullscreenjc/commits)
+
 
 
 ## 🔗 Links
