@@ -85,7 +85,6 @@ const startBweb = (videob7web, parentVideob7web) => {
 };
 
 const startCosmos = (videoElement, parentElement) => {
-  // Adiciona o botão "TELA CHEIA" ao contêiner pai do vídeo.
   // Evita adicionar um novo botão se a função for chamada mais de uma vez
   if (parentElement.querySelector(".btn-fullscreen-b7")) {
     return;
@@ -97,7 +96,20 @@ const startCosmos = (videoElement, parentElement) => {
   parentElement.appendChild(btn);
 
   btn.onclick = () => {
-    // 1. Cria os elementos do modal do zero
+    // ---- INÍCIO DAS MODIFICAÇÕES ----
+
+    // 1. CRIAÇÃO DO PLACEHOLDER
+    // Um elemento div vazio que vai "guardar o lugar" do vídeo.
+    const placeholder = document.createElement("div");
+
+    // 2. TROCA DO VÍDEO PELO PLACEHOLDER
+    // Antes de qualquer outra coisa, substituímos o vídeo pelo placeholder.
+    // Isso mantém o layout da página estável.
+    parentElement.replaceChild(placeholder, videoElement);
+
+    // ---- FIM DAS MODIFICAÇÕES ----
+
+    // Cria os elementos do modal do zero (código original)
     const modalOverlay = document.createElement("div");
     modalOverlay.className = "modal-overlay-b7";
 
@@ -108,64 +120,82 @@ const startCosmos = (videoElement, parentElement) => {
     closeModalBtn.className = "modal-close-button-b7";
     closeModalBtn.innerHTML = "&times;";
 
-    // 2. Define a ação de fechar o modal
+    // Define a ação de fechar o modal
     closeModalBtn.onclick = () => {
-      parentElement.appendChild(videoElement); // Devolve o vídeo ao seu local original
-      modalOverlay.remove(); // Remove o modal da página
-      btn.style.display = "block"; // Mostra o botão "TELA CHEIA" de novo
+      // ---- INÍCIO DAS MODIFICAÇÕES ----
+
+      // 3. DEVOLVENDO O VÍDEO AO LUGAR EXATO
+      // Em vez de 'appendChild', agora substituímos o placeholder de volta pelo vídeo.
+      if (placeholder.parentElement) {
+        placeholder.parentElement.replaceChild(videoElement, placeholder);
+      } else {
+        // Um fallback de segurança, caso algo remova o placeholder do DOM
+        parentElement.appendChild(videoElement);
+      }
+
+      // ---- FIM DAS MODIFICAÇÕES ----
+
+      modalOverlay.remove();
+      btn.style.display = "block";
     };
 
-    // 3. Monta a estrutura do modal e o exibe na tela
+    // Monta a estrutura do modal e o exibe na tela (código original)
     modalOverlay.appendChild(modalContent);
     modalOverlay.appendChild(closeModalBtn);
-    modalContent.appendChild(videoElement); // Move o vídeo para dentro do modal
-    document.body.appendChild(modalOverlay); // Adiciona o modal à página
+    modalContent.appendChild(videoElement);
+    document.body.appendChild(modalOverlay);
 
-    btn.style.display = "none"; // Esconde o botão original
+    btn.style.display = "none";
   };
 };
 
-const interval = setInterval(() => {
-  //uca faculdade
-  const contentMedia = document.querySelector(".show-content");
+const initializeVideoObserver = () => {
+  // A mesma estrutura de configuração da Opção 1.
+  const platforms = [
+    { selector: ".show-content", startFunction: startUCA },
+    { selector: ".page__media", startFunction: startApp },
+    { selector: ".gAbRoy", startFunction: startBweb },
+    { selector: '[data-testid="embed-container"]', startFunction: startCosmos },
+  ];
 
-  // hotmart 1
-  const playerVideo = document.querySelector(".page__media");
+  // Função que procura pelo vídeo e inicia o script.
+  const findAndStartVideo = () => {
+    for (const platform of platforms) {
+      const videoElement = document.querySelector(platform.selector);
 
-  //B7 web
-  const videob7web = document.querySelector(".gAbRoy");
+      if (videoElement) {
+        // Se encontramos, desconectamos o "vigia" para ele parar de consumir recursos.
+        observer.disconnect();
 
-  // const videoCosmos = document.querySelector(".css-1y4o8mg");
-  const videoCosmos = document.querySelector('[data-testid="embed-container"]');
+        const parentElement = videoElement.parentNode;
+        if (parentElement) {
+          platform.startFunction(videoElement, parentElement);
+        }
 
-  if (contentMedia) {
-    const wikiPageShow = contentMedia.parentNode;
-    clearInterval(interval);
-    startUCA(contentMedia, wikiPageShow);
+        // Retorna true para indicar que encontramos o elemento.
+        return true;
+      }
+    }
+    // Retorna false se não encontrar nada.
+    return false;
+  };
+
+  // Cria o "vigia" (Observer). Ele executará findAndStartVideo sempre que o DOM mudar.
+  const observer = new MutationObserver(() => {
+    findAndStartVideo();
+  });
+
+  // Tenta executar uma primeira vez, caso o elemento já esteja na página quando o script rodar.
+  const alreadyFound = findAndStartVideo();
+
+  // Se o elemento ainda não foi encontrado, diz ao "vigia" para começar a observar o corpo da página.
+  if (!alreadyFound) {
+    observer.observe(document.body, {
+      childList: true, // Observa adição/remoção de filhos diretos.
+      subtree: true, // Observa também os "netos", "bisnetos", etc.
+    });
   }
+};
 
-  if (videoCosmos) {
-    const parentVideo = videoCosmos.parentNode;
-    clearInterval(interval);
-    startCosmos(videoCosmos, parentVideo);
-  }
-
-  if (contentMedia) {
-    const wikiPageShow = contentMedia.parentNode;
-    clearInterval(interval);
-    startUCA(contentMedia, wikiPageShow);
-  }
-
-  if (playerVideo) {
-    const parentPlayerVideo = playerVideo.parentNode;
-    clearInterval(interval);
-    startApp(playerVideo, parentPlayerVideo);
-  }
-
-  if (videob7web) {
-    const parentVideob7web = videob7web.parentNode;
-    clearInterval(interval);
-    startBweb(videob7web, parentVideob7web);
-  }
-}, 50);
-window.addEventListener("load", initializeVideoModal);
+// Inicie todo o processo
+initializeVideoObserver();
