@@ -1,28 +1,20 @@
 {
-    "name": "fullscreenjc",
-    "description": "Esta extensão adiciona um botão para expandir o player do Faculdade UCA ",
-    "version": "1.3",
-    "manifest_version": 3,
-    "icons": {
-        "16": "/fsjc-128.png",
-        "32": "/fsjc-128.png",
-        "48": "/fsjc-128.png",
-        "128": "/fsjc-128.png"
-    },
-    "host_permissions": [
-        "https://*/*"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "https://*/*"
-            ],
-            "js": [
-                "./src/script.js"
-            ],
-            "css": [
-                "./src/styles.css"
-            ]
-        }
-    ]
+  "name": "fullscreenjc",
+  "description": "Esta extensão adiciona um botão para expandir o player do Faculdade UCA ",
+  "version": "1.4",
+  "manifest_version": 3,
+  "icons": {
+    "16": "/fsjc-128.png",
+    "32": "/fsjc-128.png",
+    "48": "/fsjc-128.png",
+    "128": "/fsjc-128.png"
+  },
+  "host_permissions": ["https://*/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "js": ["./src/script.js"],
+      "css": ["./src/styles.css"]
+    }
+  ]
 }
