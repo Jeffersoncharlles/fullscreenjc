@@ -154,7 +154,7 @@ const initializeVideoObserver = () => {
   const platforms = [
     { selector: ".show-content", startFunction: startUCA },
     { selector: ".page__media", startFunction: startApp },
-    { selector: ".gAbRoy", startFunction: startBweb },
+    { selector: ".plyr__video-wrapper", startFunction: startBweb },
     { selector: '[data-testid="embed-container"]', startFunction: startCosmos },
   ];
 
