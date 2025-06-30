@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Regra para forçar o vídeo a preencher o container do modal */
+.focototal-fullscreen-active,
+.focototal-fullscreen-active > *,
+.focototal-fullscreen-active iframe,
+.focototal-fullscreen-active video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+}

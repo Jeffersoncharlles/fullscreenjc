@@ -1,60 +1,69 @@
-# Fullscreenjc
+# React + TypeScript + Vite
 
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-<div align="center">
-  <a href="https://opensource.org/licenses/MIT"><img alt="License MIT" src="https://img.shields.io/badge/license-MIT-brightgreen"></a>
-</div>
+Currently, two official plugins are available:
 
-<p align="center">
-  <a href="#interrobang-what-is-inter">About</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#technologies">Technologies used</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#construction_worker-how-to-use-developing">How to portfolio</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#key-license">License</a>
-</p>
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
+## Expanding the ESLint configuration
 
-## PREVIEW
-<a href="https://chrome.google.com/webstore/detail/fullscreenjc/jgcackdhafaaedpmjnpnpmlnhoiplcgm?hl=pt-BR">Fullscreenjc</a>
-## 🚀 Technologies:
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-This Chrome Extension project was developed using the following technologies:
+```js
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
--   [Typescript][typescript]
--   [Chrome Extension][extention]
--   [Sass][sass]
+      // Remove tseslint.configs.recommended and replace with this
+      ...tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      ...tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      ...tseslint.configs.stylisticTypeChecked,
 
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
 
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-This project in under MIT license, for more details check in [LICENSE][license]. <br>
-Feel free to bring new features or fix problems, it will be a pleasure! 💜
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-
-<div align='center'>
-  Made with 💚  by <strong>Jefferson Charlles</strong> 🔥
-  <a href='https://www.linkedin.com/in/jeffersoncharlles/'>Get in touch!</a>
-</div>
-
-[typescript]: https://www.typescriptlang.org/
-[extention]: https://chrome.google.com/webstore/
-[nextjs]: https://nextjs.org/
-[vitejs]: https://vitejs.dev/
-[styled]: https://styled-components.com/
-[phosphoricons]: https://phosphoricons.com/
-[react-hook-form]: https://react-hook-form.com/
-[sass]: https://sass-lang.com/
-[axios]: https://axios-http.com/docs/intro
-[prismic]: https://prismic.io/
-[stripe]: https://stripe.com/br
-[react-icons]: https://react-icons.github.io/react-icons/
-[git]: https://git-scm.com
-[fauna]: https://fauna.com/
-[yarn]: https://yarnpkg.com/
-[license]: ./LICENSE
-[linkedin]: https://www.linkedin.com/in/jeffersoncharlles/
-
-
-
-
-## 🔗 Links
-[![portfolio](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://jefferdeveloper.com/)
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/jeffersoncharlles)
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
