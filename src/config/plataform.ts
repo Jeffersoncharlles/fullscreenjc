@@ -4,3 +4,10 @@ export const PLATFORM_SELECTORS = [
   ".plyr__video-wrapper",
   '[data-testid="embed-container"]',
 ];
+
+export const platforms = [
+  { selectorUca: ".show-content" },
+  { selectorApp: ".page__media" },
+  { selectorB7WebOld: ".plyr__video-wrapper" },
+  { selectorCosmos: '[data-testid="embed-container"]' },
+];

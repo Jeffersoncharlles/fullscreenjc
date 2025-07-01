@@ -2,13 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { ModalVideo } from "./components/ModalVideo";
 import "./index.css";
-
-const PLATFORM_SELECTORS = [
-  ".show-content",
-  ".page__media",
-  ".plyr__video-wrapper",
-  '[data-testid="embed-container"]',
-];
+import { platforms } from "./config/plataform";
 
 // Função que inicia a aplicação React
 function initializeReactApp(videoElement: HTMLElement) {
@@ -24,7 +18,6 @@ function initializeReactApp(videoElement: HTMLElement) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      {/* Passa o vídeo encontrado como uma prop */}
       <ModalVideo videoContainer={videoElement} />
     </React.StrictMode>
   );
@@ -32,7 +25,8 @@ function initializeReactApp(videoElement: HTMLElement) {
 
 // Função que procura pelo vídeo
 function findVideoAndStart() {
-  for (const selector of PLATFORM_SELECTORS) {
+  for (const platform of platforms) {
+    const selector = Object.values(platform)[0];
     const element = document.querySelector(selector) as HTMLElement;
     if (element) {
       // Vídeo encontrado! Inicia o React e para de procurar.
@@ -43,7 +37,6 @@ function findVideoAndStart() {
   return false;
 }
 
-// Tenta encontrar o vídeo assim que o script carrega
 if (!findVideoAndStart()) {
   // Se não encontrar, cria um observador para esperar por mudanças na página
   const observer = new MutationObserver(() => {
