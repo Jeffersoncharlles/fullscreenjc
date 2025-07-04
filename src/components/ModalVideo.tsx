@@ -1,50 +1,23 @@
 import { X } from "lucide-react";
-import { useState, useEffect, useRef, type FC } from "react"; // Importa CSSProperties
+import { useState, useRef, type FC } from "react"; // Importa CSSProperties
 import { createPortal } from "react-dom";
+import { useVideoContainerPlaceholder } from "../hooks/use-video-container-placeholder";
 
 // Define que o componente espera receber uma prop 'videoContainer'
 interface ModalVideoProps {
   videoContainer: HTMLElement;
 }
 
-const PLACEHOLDER_ID = "focototal-video-placeholder";
-
 export const ModalVideo: FC<ModalVideoProps> = ({ videoContainer }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const modalContentRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = useRef<HTMLDivElement | null>(null);
 
-  // O primeiro useEffect (que procurava o vídeo) foi removido!
+  useVideoContainerPlaceholder({
+    isModalOpen,
+    videoContainer,
+    modalContentRef,
+  });
 
-  useEffect(() => {
-    // A lógica do placeholder agora usa o videoContainer recebido via props
-    if (!videoContainer) return;
-
-    // Garante o contexto de posicionamento
-    videoContainer.style.position = "relative";
-
-    const originalParent = videoContainer.parentElement;
-    if (!originalParent) return;
-
-    if (isModalOpen) {
-      const placeholder = document.createElement("div");
-      placeholder.id = PLACEHOLDER_ID;
-      const rect = videoContainer.getBoundingClientRect();
-      placeholder.style.width = `${rect.width}px`;
-      placeholder.style.height = `${rect.height}px`;
-      originalParent.replaceChild(placeholder, videoContainer);
-      const modalContent = modalContentRef.current;
-      if (modalContent) {
-        videoContainer.classList.add("focototal-fullscreen-active");
-        modalContent.appendChild(videoContainer);
-      }
-    } else {
-      const placeholder = document.getElementById(PLACEHOLDER_ID);
-      if (placeholder && placeholder.parentElement) {
-        videoContainer.classList.remove("focototal-fullscreen-active");
-        placeholder.parentElement.replaceChild(videoContainer, placeholder);
-      }
-    }
-  }, [isModalOpen, videoContainer]);
   return (
     <>
       {/* ---- MUDANÇA PARA USAR O PORTAL ---- */}
@@ -52,12 +25,7 @@ export const ModalVideo: FC<ModalVideoProps> = ({ videoContainer }) => {
         createPortal(
           <button
             onClick={() => setIsModalOpen(true)}
-            className="absolute top-[15px] right-[25px] z-[2147483647]
-           px-4 py-2
-          text-white font-bold
-         rounded-lg select-none border border-white
-         cursor-pointer transition-colors duration-300 ease-in-out
-         "
+            className="absolute top-[15px] right-[25px] z-[2147483647] px-4 py-2 text-zinc-100 font-bold rounded-lg select-none border border-zinc-50 cursor-pointer transition-colors duration-300 ease-in-out"
           >
             Tela Cheia
           </button>,
