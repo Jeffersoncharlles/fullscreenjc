@@ -1,7 +1,10 @@
 {
   "name": "FocoTotal",
   "description": "Adiciona um modo de cinema a players de vídeo em diversas plataformas.",
-  "version": "2.3.5",
+  "version": "2.3.6",
+  "author": "Jefferson Charlles",
+  "license": "MIT",
+  "homepage_url": "https://github.com/Jeffersoncharlles/FocoTotal-Extention",
   "manifest_version": 3,
   "icons": {
     "16": "icons/focototal_16x16.png",
