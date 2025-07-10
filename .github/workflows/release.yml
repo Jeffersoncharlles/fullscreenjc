@@ -44,11 +44,11 @@ jobs:
       - name: Build the extension
         run: npm run build
 
-      # 5. Extrai a versão do manifest.json original para usar nos nomes
+      # 5. Extrai a versao do manifest.json original para usar nos nomes
       - name: Extract version from manifest.json
         id: get_version
-        # Lemos do manifest.json na raiz, não o que está na pasta de build
-        run: echo "version=$(jq -r .version manifest.json)" >> $GITHUB_OUTPUT
+        # Lemos do manifest.json na pasta public/
+        run: echo "version=$(jq -r .version public/manifest.json)" >> $GITHUB_OUTPUT
 
       # 6. Cria o nome do arquivo ZIP
       - name: Create ZIP file name
