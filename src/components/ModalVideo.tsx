@@ -1,37 +1,114 @@
 import { X } from "lucide-react";
-import { useState, useRef, type FC } from "react"; // Importa CSSProperties
+import { useState, useEffect, useRef, type FC } from "react";
 import { createPortal } from "react-dom";
-import { useVideoContainerPlaceholder } from "../hooks/use-video-container-placeholder";
 
-// Define que o componente espera receber uma prop 'videoContainer'
 interface ModalVideoProps {
   videoContainer: HTMLElement;
+  videoSrc: string;
 }
 
-export const ModalVideo: FC<ModalVideoProps> = ({ videoContainer }) => {
+const PLACEHOLDER_ID = "focototal-video-placeholder";
+
+export const ModalVideo: FC<ModalVideoProps> = ({
+  videoContainer,
+  videoSrc,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const modalContentRef = useRef<HTMLDivElement | null>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
+  const originalParentRef = useRef<HTMLElement | null>(null);
 
-  useVideoContainerPlaceholder({
-    isModalOpen,
-    videoContainer,
-    modalContentRef,
-  });
+  // Efeito 1: Gerenciador de Botão e de Estado (Reset)
+  useEffect(() => {
+    if (!videoContainer) return;
+    setIsModalOpen(false);
+    originalParentRef.current = videoContainer.parentElement;
 
+    const openButton = document.createElement("button");
+    openButton.innerText = "Tela Cheia";
+    openButton.id = "focototal-open-button"; // Damos um ID para poder escondê-lo
+    openButton.className = `absolute top-[15px] right-[15px] z-[2147483640] px-4 py-2 bg-black/60 text-white font-bold border border-white rounded-lg cursor-pointer`;
+    openButton.onclick = () => setIsModalOpen(true);
+
+    if (getComputedStyle(videoContainer).position === "static") {
+      videoContainer.style.position = "relative";
+    }
+
+    // Apenas adiciona o botão se ele não existir
+    if (!videoContainer.querySelector("#focototal-open-button")) {
+      videoContainer.appendChild(openButton);
+    }
+
+    return () => {
+      if (openButton && openButton.parentElement) {
+        openButton.remove();
+      }
+    };
+  }, [videoSrc, videoContainer]);
+
+  // EFEITO 2: O Movedor de DOM com ajuste de Estilo
+  useEffect(() => {
+    if (!originalParentRef.current) return;
+
+    const originalParent = originalParentRef.current;
+    const openButton = videoContainer.querySelector<HTMLElement>(
+      "#focototal-open-button"
+    );
+
+    if (isModalOpen) {
+      // Esconde o botão "Tela Cheia" quando o modal está aberto
+      if (openButton) openButton.style.display = "none";
+
+      const placeholder = document.createElement("div");
+      placeholder.id = PLACEHOLDER_ID;
+      const rect = videoContainer.getBoundingClientRect();
+      placeholder.style.width = `${rect.width}px`;
+      placeholder.style.height = `${rect.height}px`;
+
+      originalParent.replaceChild(placeholder, videoContainer);
+      const modalContent = modalContentRef.current;
+      if (modalContent) {
+        modalContent.appendChild(videoContainer);
+
+        // ======================= AJUSTE DE ESTILO ADICIONADO AQUI =======================
+        // Força o container e o iframe a preencherem o espaço do modal
+        videoContainer.style.setProperty("width", "100%", "important");
+        videoContainer.style.setProperty("height", "100%", "important");
+        videoContainer.style.setProperty("max-width", "none", "important");
+        videoContainer.style.setProperty("max-height", "none", "important");
+        const iframe = videoContainer.querySelector("iframe");
+        if (iframe) {
+          iframe.style.width = "100%";
+          iframe.style.height = "100%";
+        }
+        // ==============================================================================
+      }
+    } else {
+      // Mostra o botão "Tela Cheia" novamente quando o modal fecha
+      if (openButton) openButton.style.display = "block";
+
+      const placeholder = document.getElementById(PLACEHOLDER_ID);
+      if (placeholder && placeholder.parentElement) {
+        // Devolve o vídeo ao placeholder
+        placeholder.parentElement.replaceChild(videoContainer, placeholder);
+        placeholder.remove();
+
+        // ======================= LIMPEZA DE ESTILO ADICIONADA AQUI =======================
+        // Remove os estilos inline para que o vídeo volte ao normal
+        videoContainer.style.width = "";
+        videoContainer.style.height = "";
+        const iframe = videoContainer.querySelector("iframe");
+        if (iframe) {
+          iframe.style.width = "";
+          iframe.style.height = "";
+        }
+        // ===============================================================================
+      }
+    }
+  }, [isModalOpen, videoContainer]);
+
+  // O JSX do modal, agora com centralização via flexbox
   return (
     <>
-      {/* ---- MUDANÇA PARA USAR O PORTAL ---- */}
-      {!isModalOpen &&
-        createPortal(
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-[15px] right-[25px] z-[2147483647] px-4 py-2 text-zinc-100 font-bold rounded-lg select-none border border-zinc-50 cursor-pointer transition-colors duration-300 ease-in-out"
-          >
-            Tela Cheia
-          </button>,
-          videoContainer // O alvo do nosso portal é o próprio container do vídeo
-        )}
-
       {isModalOpen &&
         createPortal(
           <div className="fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-[2147483640] p-4">

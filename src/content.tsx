@@ -2,52 +2,70 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { ModalVideo } from "./components/ModalVideo";
 import "./index.css";
-import { platforms } from "./config/plataform";
 
-// Função que inicia a aplicação React
-function initializeReactApp(videoElement: HTMLElement) {
-  // Evita injetar a aplicação mais de uma vez
-  if (document.getElementById("focototal-react-root")) {
-    return;
+export const PLATFORM_SELECTORS = [
+  ".show-content",
+  ".page__media",
+  ".plyr__video-wrapper",
+  '[data-testid="embed-container"]',
+];
+
+let currentVideoSrc: string | null = null; // Guarda o SRC do vídeo atual
+let reactRoot: ReactDOM.Root | null = null; // Guarda a referência da nossa raiz React
+
+// Função que inicia e atualiza nosso app
+function renderApp(videoContainer: HTMLElement, videoSrc: string) {
+  // Se o app ainda não foi criado, crie-o
+  if (!reactRoot) {
+    const rootDiv = document.createElement("div");
+    rootDiv.id = "focototal-react-app-root";
+    document.body.appendChild(rootDiv); // Anexa ao body para não ser destruído
+    reactRoot = ReactDOM.createRoot(rootDiv);
   }
 
-  const rootElement = document.createElement("div");
-  rootElement.id = "focototal-react-root";
-  document.body.appendChild(rootElement);
+  // Atualiza o SRC atual em memória
+  currentVideoSrc = videoSrc;
 
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
+  // Renderiza/Atualiza o componente React com as novas props
+  reactRoot.render(
     <React.StrictMode>
-      <ModalVideo videoContainer={videoElement} />
+      <ModalVideo videoContainer={videoContainer} videoSrc={videoSrc} />
     </React.StrictMode>
   );
 }
 
-// Função que procura pelo vídeo
-function findVideoAndStart() {
-  for (const platform of platforms) {
-    const selector = Object.values(platform)[0];
-    const element = document.querySelector(selector) as HTMLElement;
-    if (element) {
-      // Vídeo encontrado! Inicia o React e para de procurar.
-      initializeReactApp(element);
-      return true;
+// Função principal que verifica o estado do vídeo na página
+function handleStateCheck() {
+  for (const platformSelector of PLATFORM_SELECTORS) {
+    const videoContainer = document.querySelector(platformSelector);
+    if (videoContainer) {
+      const iframe = videoContainer.querySelector("iframe");
+      // biome-ignore lint/complexity/useOptionalChain: <explanation>
+      if (iframe && iframe.src) {
+        renderApp(videoContainer as HTMLElement, iframe.src);
+        const newSrc = iframe.src;
+        if (newSrc !== currentVideoSrc) {
+          renderApp(videoContainer as HTMLElement, newSrc);
+        }
+      }
     }
   }
-  return false;
 }
 
-if (!findVideoAndStart()) {
-  // Se não encontrar, cria um observador para esperar por mudanças na página
-  const observer = new MutationObserver(() => {
-    if (findVideoAndStart()) {
-      // Quando encontrar, para de observar para economizar recursos
-      observer.disconnect();
-    }
-  });
+// Nosso observador que monitora a página inteira
+const observer = new MutationObserver(() => {
+  // Usamos um debounce para não rodar a verificação excessivamente
+  // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
+  let debounceTimer;
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(handleStateCheck, 250);
+});
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
-}
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+  attributes: true, // Importante para pegar mudanças de de attributes
+});
+
+// Executa a verificação uma vez no início
+handleStateCheck();
