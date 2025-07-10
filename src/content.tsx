@@ -55,7 +55,7 @@ function handleStateCheck() {
 // Nosso observador que monitora a página inteira
 const observer = new MutationObserver(() => {
   // Usamos um debounce para não rodar a verificação excessivamente
-  // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
+
   let debounceTimer;
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(handleStateCheck, 250);

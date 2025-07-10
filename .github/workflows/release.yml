@@ -1,0 +1,68 @@
+# Nome do Workflow
+name: Create Release on Version Update
+
+# Gatilho (Trigger)
+# Este workflow roda automaticamente quando um push é feito para a branch 'main'
+# E SOMENTE SE houver alterações no arquivo 'manifest.json'.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "manifest.json"
+
+# Tarefas (Jobs)
+jobs:
+  build-and-release:
+    # O tipo de máquina virtual para rodar o job
+    runs-on: ubuntu-latest
+
+    # Permissões necessárias para o job poder criar releases e escrever no repositório.
+    permissions:
+      contents: write
+
+    # Passos que serão executados
+    steps:
+      # 1. Faz o checkout do código do seu repositório para a máquina virtual
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Extrai a versão do arquivo manifest.json
+      # Usamos 'jq' (uma ferramenta de linha de comando para JSON) para ler o valor da chave "version".
+      # O resultado é salvo em uma variável de output para ser usado nos próximos passos.
+      - name: Extract version from manifest.json
+        id: get_version
+        run: echo "version=$(jq -r .version manifest.json)" >> $GITHUB_OUTPUT
+
+      # 3. Cria o nome do arquivo ZIP que será gerado
+      # Ex: FocoTotal-Extention-v1.1.zip
+      - name: Create ZIP file name
+        id: zip_name
+        run: echo "name=FocoTotal-Extention-v${{ steps.get_version.outputs.version }}.zip" >> $GITHUB_OUTPUT
+
+      # 4. Compacta os arquivos da extensão em um arquivo .zip
+      # O '-x' exclui arquivos e pastas desnecessários do pacote final.
+      - name: Zip extension files
+        run: zip -r ${{ steps.zip_name.outputs.name }} . -x ".git/*" ".github/*" "README.md"
+
+      # 5. Cria a Tag e a Release no GitHub
+      # Usa uma Action popular e confiável para criar a release.
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # O nome do arquivo que será anexado à release.
+          files: ${{ steps.zip_name.outputs.name }}
+          # O nome da tag que será criada (ex: v1.1)
+          tag_name: v${{ steps.get_version.outputs.version }}
+          # O título da Release (ex: Release v1.1)
+          name: Release v${{ steps.get_version.outputs.version }}
+          # Corpo da release (você pode customizar isso ou deixar em branco)
+          body: |
+            Lançamento oficial da versão ${{ steps.get_version.outputs.version }} da extensão FocoTotal.
+
+            **Assets:**
+            - Arquivo de instalação (`.zip`) anexado abaixo.
+          # 'false' significa que a release será publicada imediatamente.
+          # Mude para 'true' se quiser que ela seja criada como um rascunho (draft).
+          draft: false
+          prerelease: false
