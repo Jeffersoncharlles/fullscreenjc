@@ -60,7 +60,7 @@ jobs:
       # Se sua pasta de build se chamar 'dist', troque 'build' por 'dist' abaixo.
       - name: Zip built extension files
         run: |
-          cd build
+          cd dist
           zip -r ../${{ steps.zip_name.outputs.name }} .
 
       # 8. Cria a Tag e a Release no GitHub com o ZIP gerado
